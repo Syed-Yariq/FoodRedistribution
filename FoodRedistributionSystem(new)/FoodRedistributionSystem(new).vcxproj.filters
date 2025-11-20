@@ -18,9 +18,6 @@
     <ClInclude Include="Redistribution.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="FoodRedistributionSystem.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="redistribution.cpp">

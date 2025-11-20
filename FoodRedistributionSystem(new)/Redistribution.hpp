@@ -194,5 +194,18 @@ public:
         const Request& request);
 };
 
+//roads
+template <typename T>   
+class Roads {
+private:
+    unordered_map<T, vector<pair<T, int>>> roadMap; // node -> [(neighbor, weight)]
+
+public:
+    void addRoad(T from, T to, int distance);
+    void addLocation(T node);
+    void shortestPath(T start, T end);
+};
+
+
 //Include so compiler can see it at compile time (code above this, dont code after it)
 #include "redistribution.cpp"

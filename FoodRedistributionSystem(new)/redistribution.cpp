@@ -1,5 +1,4 @@
-﻿#include "redistribution.hpp"
-#include <stdexcept>
+﻿#include <stdexcept>
 #include "Redistribution.hpp"
 
 using namespace std;
@@ -627,5 +626,79 @@ void DonationLinkedList::removeExpiredDonations(const string& todayDate) {
             prev = temp;
             temp = temp->next;
         }
+
     }
 }
+
+//Roads
+template <typename T>
+void Roads<T>::addLocation(T location) {
+    if (roadMap.find(location) == roadMap.end()) {
+        roadMap[location] = {};
+        cout << "Location added: " << location << endl;
+    }
+    else {
+        cout << "Location already exists: " << location << endl;
+    }
+}
+
+template <typename T>
+void Roads<T>::addRoad(T from, T to, int distance) {
+    roadMap[from].push_back({ to, distance });
+    roadMap[to].push_back({ from, distance });
+}
+
+template <typename T>
+void Roads<T>::shortestPath(T start, T end) {
+    // Dijkstra's algorithm implementation
+    unordered_map<T, int> dist;
+    unordered_map<T, T> prev;
+    PriorityQueue<pair<int, T>> pq;
+
+    for (const auto& loc : roadMap) {
+        dist[loc.first] = INT_MAX;
+        prev[loc.first] = T();
+    }
+
+    dist[start] = 0;
+    pq.push({ 0, start });
+
+    while (!pq.isEmpty()) {
+        T current = pq.top().second;
+        pq.pop();
+
+        if (current == end) break;
+
+        for (const auto& neighbor : roadMap[current]) {
+            T next = neighbor.first;
+            int weight = neighbor.second;
+
+            int alt = dist[current] + weight;
+            if (alt < dist[next]) {
+                dist[next] = alt;
+                prev[next] = current;
+                pq.push({ alt, next });
+            }
+        }
+    }
+
+    // Reconstruct path
+    vector<T> path;
+    for (T at = end; at != T(); at = prev[at]) {
+        path.push_back(at);
+    }
+    reverse(path.begin(), path.end());
+
+    // Display path
+    if (dist[end] == INT_MAX) {
+        cout << "No path from " << start << " to " << end << endl;
+    }
+    else {
+        cout << "Shortest path from " << start << " to " << end << ": ";
+        for (const auto& loc : path) {
+            cout << loc << " ";
+        }
+        cout << "(Distance: " << dist[end] << ")" << endl;
+    }
+}
+
