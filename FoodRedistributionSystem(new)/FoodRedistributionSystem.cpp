@@ -32,6 +32,7 @@ int main() {
 
 	initializeKarachiMap();
 
+	//start of hardcoded test cases
 	// ---------------------------------------------
 	// 1) Donors
 	// ---------------------------------------------
@@ -110,6 +111,7 @@ int main() {
 	cout << "\n=== FULFILL SUMMARY ===\n";
 	cout << "Requests fulfilled: " << fulfilled << "\n";
 	cout << "Pending requests left: " << pendingQueue.size() << "\n";
+	//end of hardcoded test cases
 
 
 
@@ -395,7 +397,13 @@ int main() {
 							cout << "Quantity             : "; cin >> qty; cin.ignore();
 							cout << "Organization Type    : "; getline(cin, orgType);
 							cout << "Organization Name    : "; getline(cin, orgName);
-							cout << "Location             : "; getline(cin, loc);
+							cout << "Location             : ";
+							for (int i = 0; i < predefinedLocations.size(); i++) {
+								cout << i + 1 << ". " << predefinedLocations[i] << endl;
+								int locChoice;
+								cin >> locChoice; cin.ignore();
+								locChoice = max(1, min(locChoice, (int)predefinedLocations.size()));
+							}
 							cout << "Request Date (YYYY-MM-DD): "; getline(cin, date);
 
 							// Create new updated request
