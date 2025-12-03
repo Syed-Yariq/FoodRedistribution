@@ -38,7 +38,7 @@ int main() {
 	// ---------------------------------------------
 	DonorLinkedList donors;
 	donors.addDonor(Donor(101, "Ali Khan", "0300-1111111", "Individual", "Gulshan-e-Iqbal"));
-	donors.addDonor(Donor(102, "Fatima Trust", "0300-2222222", "Organization", "Nazimabad"));
+	donors.addDonor(Donor(102, "Fatima Trust", "0300-2222222", "Organization", "North Nazimabad"));
 	donors.addDonor(Donor(103, "Usman Welfare", "0300-3333333", "Organization", "Clifton"));
 
 	cout << "-- Donors Added --\n";

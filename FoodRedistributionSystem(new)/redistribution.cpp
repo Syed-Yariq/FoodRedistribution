@@ -945,7 +945,7 @@ void Roads<T>::shortestPath(T start, T end) {
     else {
         cout << "Shortest path from " << start << " to " << end << ": ";
         for (const auto& loc : path) {
-            cout << loc << " ";
+            cout << loc << " -> ";
         }
         cout << "(Distance: " << dist[end] << ")" << endl;
     }
@@ -957,8 +957,6 @@ string karachiLocations[] = {
     "Shahrah-e-Faisal", "Gulberg", "Landhi", "SITE", "Buffer Zone"
 };
 const int NUM_LOCATIONS = 15;
-
-// Create Roads object
 Roads<string> karachiRoads;
 
 // Initialize locations and roads
@@ -968,26 +966,37 @@ void initializeKarachiMap() {
         karachiRoads.addLocation(karachiLocations[i]);
     }
 
-    // Add some sample roads distances in km
-    karachiRoads.addRoad("Clifton", "Saddar", 8);
-    karachiRoads.addRoad("Clifton", "Defense", 6);
+        
+    karachiRoads.addRoad("Saddar", "Clifton", 8);
     karachiRoads.addRoad("Saddar", "PECHS", 5);
-    karachiRoads.addRoad("PECHS", "Gulshan-e-Iqbal", 7);
-    karachiRoads.addRoad("Gulshan-e-Iqbal", "Korangi", 10);
-    karachiRoads.addRoad("North Nazimabad", "Saddar", 12);
-    karachiRoads.addRoad("Malir", "Landhi", 9);
-    karachiRoads.addRoad("Lyari", "Saddar", 4);
-    karachiRoads.addRoad("Bahadurabad", "Shahrah-e-Faisal", 3);
+    karachiRoads.addRoad("Saddar", "Lyari", 4);
+    karachiRoads.addRoad("Saddar", "Gulshan-e-Iqbal", 10);
+    karachiRoads.addRoad("Saddar", "North Nazimabad", 12);
+    
+    karachiRoads.addRoad("Clifton", "Defense", 6);
     karachiRoads.addRoad("Defense", "PECHS", 6);
-    karachiRoads.addRoad("Landhi", "Korangi", 8);
-    karachiRoads.addRoad("Buffer Zone", "North Nazimabad", 5);
-    karachiRoads.addRoad("SITE", "Landhi", 7);
-    karachiRoads.addRoad("Gulberg", "Saddar", 6);
+    karachiRoads.addRoad("Defense", "Korangi", 12);
+    
+    karachiRoads.addRoad("PECHS", "Bahadurabad", 3);
+    karachiRoads.addRoad("Bahadurabad", "Gulshan-e-Iqbal", 6);
+    karachiRoads.addRoad("Gulshan-e-Iqbal", "Gulistan-e-Jauhar", 4);
+    karachiRoads.addRoad("Gulistan-e-Jauhar", "Malir", 9);
+    karachiRoads.addRoad("Malir", "Shah Faisal Colony", 5);
+    karachiRoads.addRoad("Shah Faisal Colony", "Korangi", 6);
+    
+    karachiRoads.addRoad("Korangi", "Landhi", 8);
+    karachiRoads.addRoad("Landhi", "SITE", 14);
+    
+    karachiRoads.addRoad("North Nazimabad", "Buffer Zone", 5);
+    karachiRoads.addRoad("Buffer Zone", "Gulberg", 4);
+    karachiRoads.addRoad("Gulberg", "Gulshan-e-Iqbal", 7);
+    
+    karachiRoads.addRoad("SITE", "Lyari", 7);
+    karachiRoads.addRoad("SITE", "North Nazimabad", 11);
+
+    karachiRoads.addRoad("Clifton", "Lyari", 6);
+    karachiRoads.addRoad("Gulistan-e-Jauhar", "Shah Faisal Colony", 5);
+    karachiRoads.addRoad("Bahadurabad", "Korangi", 10);
+    karachiRoads.addRoad("Gulshan-e-Iqbal", "Malir", 12);
 }
 
-// Example: when fulfilling requests
-void deliverRequestWithDistance(Donor* donor, Request& r) {
-    cout << "Calculating shortest path from donor at " << donor->getAddress()
-        << " to recipient at " << r.location << "...\n";
-    karachiRoads.shortestPath(donor->getAddress(), r.location);
-}
