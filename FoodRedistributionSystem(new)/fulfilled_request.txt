@@ -15,3 +15,4 @@ Afaq,rice,2,CHARITY,OSi,Buffer Zone,3,1,2025-11-20
 Afaq,rice,20,HOSPITAL,jdc,Gulberg,1,1,2025-11-10
 Azan,rice,5,OLDAGE HOME,s,Gulberg,2,1,2025-10-11
 sara,rice,20,JDC,jdc,Clifton,4,1,2025-11-10
+Farooq,rice,2,CHARITY,jdc,Clifton,3,1,2025-11-10

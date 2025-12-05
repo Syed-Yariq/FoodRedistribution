@@ -748,49 +748,32 @@ FoodDonation* DonationLinkedList::findMatchingDonation(const string& foodTypeNee
     if (head == nullptr) {
         return nullptr;
     }
-
     string neededLower = toLower(foodTypeNeeded);
     DonationNode* temp = head;
-
     while (temp != nullptr) {
         FoodDonation& d = temp->data;
-
         // Food type mismatch
         if (toLower(d.getFoodType()) != neededLower) {
             temp = temp->next;
             continue;
         }
-
         // Insufficient quantity
         if (d.getQuantity() < quantityNeeded) {
-            cout <<  request.recipientName
-                << " (" << request.organizationName
-                << "): insufficient quantity (need: " << quantityNeeded
-                << ", available: " << d.getQuantity() << ")\n";
             temp = temp->next;
             continue;
         }
-
         // Not pending
         if (d.getStatus() != "Pending") {
-            cout << request.recipientName
-                << " (" << request.organizationName
-                << "): not available (status: " << d.getStatus() << ")\n";
             temp = temp->next;
             continue;
         }
-
         // Expired
         string expiry = trim(d.getExpiryDate());
         string reqDate = trim(requestDate);
         if (expiry <= reqDate) {
-            cout << request.recipientName
-                << " (" << request.organizationName
-                << "): expired (" << expiry << " <= " << reqDate << ")\n";
             temp = temp->next;
             continue;
         }
-
         return &d;
     }
     return nullptr;
