@@ -85,15 +85,17 @@ public:
 template <typename T>
 class PriorityQueue {
 private:
-    priority_queue<T> pq;
+    vector<T> heap;
 
 public:
     void push(const T& value);
     void pop();
     T top();
     bool isEmpty();
-    size_t size();
+    int size();
     void display();
+    const vector<T>& getQueue() const;
+    const vector<T>& getHeap() const;
 };
 
 
@@ -174,6 +176,7 @@ private:
 
 public:
     FoodDonation(int dId = 0, int drId = 0, string type = "", int qty = 0, string date = "", string stat = "Pending" );
+
 
     int getDonationId() const;
     int getDonorId() const;

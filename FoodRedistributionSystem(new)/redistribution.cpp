@@ -4,7 +4,8 @@
 #include <string>       // for string
 #include <iostream>     // cout, cin
 #include "Redistribution.hpp"
-
+#include <vector>
+#include <istream>
 using namespace std;
 
 // trim function 
@@ -57,13 +58,27 @@ void Stack<T>::clear() {
 
 // save recent fullfilled request
 void saveSingleFulfilledRequest(const Request& r, const std::string& filename) {
-    std::ofstream out(filename, std::ios::app);  // append mode
+    bool fileIsEmpty = false;
+
+    // Check if file exists and is empty
+    std::ifstream check(filename);
+    fileIsEmpty = check.peek() == std::ifstream::traits_type::eof();
+    check.close();
+
+    std::ofstream out(filename, std::ios::app); // append mode
 
     if (!out) {
         std::cout << "Error opening file for saving!\n";
         return;
     }
 
+    // Write CSV header ONLY if file was empty
+    if (fileIsEmpty) {
+        out << "RecipientName,FoodType,Quantity,OrganizationType,"
+            "OrganizationName,Location,PriorityLevel,IsFulfilled,RequestDate\n";
+    }
+
+    // Write CSV row
     out << r.recipientName << ","
         << r.foodType << ","
         << r.quantity << ","
@@ -72,11 +87,11 @@ void saveSingleFulfilledRequest(const Request& r, const std::string& filename) {
         << r.location << ","
         << r.priorityLevel << ","
         << r.isFulfilled << ","
-        << r.requestDate
-        << "\n";
+        << r.requestDate << "\n";
 
     out.close();
 }
+
 // load fullfilled requests
 void loadFulfilledRequests(Stack<Request>& fulfilled, const std::string& filename) {
     std::ifstream in(filename);
@@ -220,48 +235,93 @@ void Queue<Request>::display() {
 }
 
 
-//PriorityQueue
+// Helper functions for heap operations
 template <typename T>
-void PriorityQueue<T>::push(const T& value) { pq.push(value); }
+void heapifyUp(vector<T>& heap, int index) {
+    while (index > 0) {
+        int parent = (index - 1) / 2;
+        if (heap[index] < heap[parent]) break;
+        T temp = heap[index];
+        heap[index] = heap[parent];
+        heap[parent] = temp;
+        index = parent;
+    }
+}
+
+template <typename T>
+void heapifyDown(vector<T>& heap, int index) {
+    int n = heap.size();
+    while (true) {
+        int left = 2 * index + 1;
+        int right = 2 * index + 2;
+        int largest = index;
+
+        // Use operator< instead of > for custom types
+        if (left < n && heap[largest] < heap[left]) largest = left;
+        if (right < n && heap[largest] < heap[right]) largest = right;
+
+        if (largest == index) break;
+
+        T temp = heap[index];
+        heap[index] = heap[largest];
+        heap[largest] = temp;
+
+        index = largest;
+    }
+}
+
+// PriorityQueue 
+template <typename T>
+void PriorityQueue<T>::push(const T& value) {
+    heap.push_back(value);
+    heapifyUp(heap, heap.size() - 1);
+}
 
 template <typename T>
 void PriorityQueue<T>::pop() {
-    if (pq.empty()) throw out_of_range("Priority queue is empty");
-    pq.pop();
+    if (heap.empty()) {
+        cout << "PriorityQueue is empty.\n";
+        return;
+    }
+    heap[0] = heap.back();
+    heap.pop_back();
+    if (!heap.empty()) heapifyDown(heap, 0);
 }
 
 template <typename T>
 T PriorityQueue<T>::top() {
-    if (pq.empty()) throw out_of_range("Priority queue is empty");
-    return pq.top();
+    if (heap.empty()) {
+        cout << "PriorityQueue is empty.\n";
+        return T(); // return default T
+    }
+    return heap[0];
 }
 
 template <typename T>
-bool PriorityQueue<T>::isEmpty() { 
-    return pq.empty(); 
+bool PriorityQueue<T>::isEmpty() {
+    return heap.empty();
 }
 
 template <typename T>
-size_t PriorityQueue<T>::size() { return pq.size(); }
+int PriorityQueue<T>::size() {
+    return heap.size();
+}
 
-template <>
-void PriorityQueue<Request>::display() {
-    if (pq.empty()) {
-        cout << "No requests available.\n";
-        return;
+template <typename T>
+void PriorityQueue<T>::display() {
+    for (int i = 0; i < heap.size(); i++) {
+        // Use a readable format for Request objects
+        cout << heap[i].recipientName << " from " << heap[i].organizationName
+            << " (" << heap[i].organizationType << ") wants "
+            << heap[i].quantity << " of " << heap[i].foodType
+            << (heap[i].isUrgent ? " [URGENT]" : "")
+            << (heap[i].isFulfilled ? " [FULFILLED]" : " [PENDING]")
+            << endl;
     }
-
-    priority_queue<Request> temp = pq;
-    int i = 0;
-    while (!temp.empty()) {
-        Request r = temp.top();
-        cout << i++ << ". " << r.recipientName << " from " << r.organizationName
-            << " (" << r.organizationType << ", " << r.location << ") wants "
-            << r.quantity << " of " << r.foodType
-            << " [Priority: " << r.priorityLevel << "] "
-            << (r.isFulfilled ? "[FULFILLED]" : "[PENDING]") << endl;
-        temp.pop();
-    }
+}
+template <typename T>
+const vector<T>& PriorityQueue<T>::getHeap() const {
+    return heap;
 }
 
 //save Pending Requests
@@ -287,49 +347,73 @@ void savePendingRequests(Queue<Request>& q, const std::string& filename) {
     out.close();
 }
 // load pending requests
-void loadPendingRequests(Queue<Request>& q, const std::string& filename) {
-    std::ifstream in(filename);
-    if (!in) return;
+void loadPendingRequests(Queue<Request>& q, const string filename)
+{
+    ifstream in(filename);
+    if (!in) {
+        cout << "Error opening file!\n";
+        return;
+    }
 
-    q.clear();
-    std::string line;
-    while (getline(in, line)) {
-        std::stringstream ss(line);
-        std::string name, food, orgType, orgName, loc, date, fulfilledStr, prioStr;
-        int qty, prio; bool fulfilled;
+    string line;
 
-        getline(ss, name, ',');
-        getline(ss, food, ',');
-        ss >> qty; ss.ignore();
-        getline(ss, orgType, ',');
-        getline(ss, orgName, ',');
-        getline(ss, loc, ',');
-        getline(ss, date, ',');
-        getline(ss, fulfilledStr, ',');
-        getline(ss, prioStr, ',');
+    // Skip header
+    getline(in, line);
 
-        fulfilled = (fulfilledStr == "1" || fulfilledStr == "true");
-        prio = stoi(prioStr);
+    while (getline(in, line))
+    {
+        stringstream ss(line);
+        string value;
 
-        Request r(name, food, qty, orgType, orgName, loc, date);
-        r.isFulfilled = fulfilled;
-        r.priorityLevel = prio;
+        Request r;
+
+        getline(ss, r.recipientName, ',');
+        getline(ss, r.foodType, ',');
+
+        getline(ss, value, ',');
+        r.quantity = stoi(value);
+
+        getline(ss, r.organizationType, ',');
+        getline(ss, r.organizationName, ',');
+        getline(ss, r.location, ',');
+        getline(ss, r.requestDate, ',');
+
+        getline(ss, value, ',');
+        r.isFulfilled = (value == "1" || value == "true");
+
+        getline(ss, value, ',');
+        r.priorityLevel = stoi(value);
 
         q.enqueue(r);
     }
+
     in.close();
 }
 
+
 // save Urgent Requests
-void saveUrgentRequests(PriorityQueue<Request>& pq, const std::string& filename) {
-    std::ofstream out(filename);
-    if (!out) { std::cout << "Cannot open file: " << filename << "\n"; return; }
+void saveUrgentRequests(PriorityQueue<Request>& pq, const std::string& filename)
+{
+    // Check if file exists and is empty
+    std::ifstream check(filename);
+    bool fileIsEmpty = check.peek() == std::ifstream::traits_type::eof();
+    check.close();
 
-    PriorityQueue<Request> temp = pq; // copy to avoid modifying original
+    std::ofstream out(filename, std::ios::app);
+    if (!out) {
+        std::cout << "Error opening file!\n";
+        return;
+    }
 
-    while (!temp.isEmpty()) {
-        Request r = temp.top();
-        temp.pop();
+    // Write CSV header only if file is empty
+    if (fileIsEmpty) {
+        out << "RecipientName,FoodType,Quantity,OrganizationType,OrganizationName,"
+               "Location,RequestDate,IsFulfilled,PriorityLevel\n";
+    }
+
+    // Loop over the internal heap using the getter
+    const std::vector<Request>& tempHeap = pq.getHeap();
+    for (const Request& r : tempHeap) {
         out << r.recipientName << ","
             << r.foodType << ","
             << r.quantity << ","
@@ -340,8 +424,10 @@ void saveUrgentRequests(PriorityQueue<Request>& pq, const std::string& filename)
             << r.isFulfilled << ","
             << r.priorityLevel << "\n";
     }
+
     out.close();
 }
+
 // load urgent requests
 void loadUrgentRequests(PriorityQueue<Request>& pq, const std::string& filename) {
     std::ifstream in(filename);
@@ -545,21 +631,29 @@ void DonorLinkedList::displayDonors() const
     }
 }
 
-void DonorLinkedList::saveToFile(const string& filename) {
+void DonorLinkedList::saveToFile(const string& filename)
+{
     ofstream out(filename);
-    DonorNode* temp = head;
 
+    // CSV Header
+    out << "DonorID,DonorName,ContactInfo,DonorType,Address\n";
+
+    DonorNode* temp = head;
     while (temp) {
+
+        // Write CSV row
         out << temp->data.getDonorId() << ","
             << temp->data.getDonorName() << ","
             << temp->data.getContactInfo() << ","
             << temp->data.getDonorType() << ","
             << temp->data.getAddress() << "\n";
+
         temp = temp->next;
     }
 
     out.close();
 }
+
 void DonorLinkedList::loadFromFile(const string& filename) {
     ifstream in(filename);
     if (!in) return;
@@ -569,7 +663,7 @@ void DonorLinkedList::loadFromFile(const string& filename) {
 
     while (getline(in, line)) {
         stringstream ss(line);
-
+        
         string id, name, contact, type, addr;
 
         getline(ss, id, ',');
@@ -848,31 +942,35 @@ void DonationLinkedList::saveToFile(const string& filename) {
 
     out.close();
 }
-void DonationLinkedList::loadFromFile(const string& filename) {
+void DonationLinkedList::loadFromFile(const string& filename)
+{
     ifstream in(filename);
     if (!in) return;
 
     head = nullptr;
     string line;
 
-    while (getline(in, line)) {
+    while (getline(in, line))
+    {
         stringstream ss(line);
 
-        string did, donorid, food, qty,orgQty ,exp, stat;
+        string did, donorid, food, qty, orgQty, exp, stat;
 
-        getline(ss, did, ',');
-        getline(ss, donorid, ',');
-        getline(ss, food, ',');
-        getline(ss, qty, ',');
-        getline(ss, exp, ',');
-        getline(ss, stat);
+        getline(ss, did, ',');       // Donation ID
+        getline(ss, donorid, ',');   // Donor ID
+        getline(ss, food, ',');      // Food Type
+        getline(ss, qty, ',');       // Quantity
+        getline(ss, exp, ',');       // Expiry
+        getline(ss, stat);      // Status
 
-        FoodDonation d(stoi(did), stoi(donorid), food, stoi(qty), exp, stat);
+        FoodDonation d(stoi(did),stoi(donorid),food,stoi(qty),exp,stat);
+
         addDonation(d);
     }
 
     in.close();
 }
+
 void displayDonorDonationStatistics(DonorLinkedList& donors, DonationLinkedList& donations) {
     cout << "\n==================================================\n";
     cout << "          DONOR & DONATION STATISTICS            \n";

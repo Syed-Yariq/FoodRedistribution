@@ -546,11 +546,11 @@ int main() {
 
 	} while (choice != 6);
 
-	donors.saveToFile("donors.txt");
-	donations.saveToFile("donations.txt");
+	donors.saveToFile("donors.csv");
+	donations.saveToFile("donations.csv");
 
-	savePendingRequests(pendingQueue, "pending.txt");
-	saveUrgentRequests(requestPQ, "urgent.txt");
+	savePendingRequests(pendingQueue, "pending.csv");
+	saveUrgentRequests(requestPQ, "urgent.csv");
 
 
 	
