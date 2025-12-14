@@ -93,35 +93,51 @@ void saveSingleFulfilledRequest(const Request& r, const std::string& filename) {
 }
 
 // load fullfilled requests
-void loadFulfilledRequests(Stack<Request>& fulfilled, const std::string& filename) {
-    std::ifstream in(filename);
+void loadFulfilledRequests(Stack<Request>& fulfilled, const string& filename)
+{
+    ifstream in(filename);
     if (!in) return;
 
     fulfilled.clear();
 
-    std::string line;
-    while (getline(in, line)) {
-        std::stringstream ss(line);
-        std::string recipient, food, orgType, orgName, loc, date, tempQty, tempPriority, tempFulfilled;
+    string line;
+    getline(in, line);
 
-        getline(ss, recipient, ',');
-        getline(ss, food, ',');
-        getline(ss, tempQty, ',');
-        getline(ss, orgType, ',');
-        getline(ss, orgName, ',');
-        getline(ss, loc, ',');
-        getline(ss, tempPriority, ',');
-        getline(ss, tempFulfilled, ',');
-        getline(ss, date, ',');
+    while (getline(in, line))
+    {
+        if (line.empty()) continue;
 
-        Request r(recipient, food, std::stoi(tempQty), orgType, orgName, loc, date);
-        r.isFulfilled = (tempFulfilled == "1" || tempFulfilled == "true");
-        r.priorityLevel = std::stoi(tempPriority);
+        stringstream ss(line);
+        string value;
+
+        Request r;
+
+        getline(ss, r.recipientName, ',');
+        getline(ss, r.foodType, ',');
+
+        getline(ss, value, ',');
+        if (value.empty()) continue;
+        r.quantity = atoi(value.c_str());
+
+        getline(ss, r.organizationType, ',');
+        getline(ss, r.organizationName, ',');
+        getline(ss, r.location, ',');
+
+        getline(ss, value, ',');
+        r.priorityLevel = atoi(value.c_str());
+
+        getline(ss, value, ',');
+        r.isFulfilled = (value == "1" || value == "true");
+
+        getline(ss, r.requestDate);
 
         fulfilled.push(r);
     }
+
     in.close();
 }
+
+
 //Queue
 template <typename T>
 Queue<T>::Queue() {
@@ -654,30 +670,41 @@ void DonorLinkedList::saveToFile(const string& filename)
     out.close();
 }
 
-void DonorLinkedList::loadFromFile(const string& filename) {
+void DonorLinkedList::loadFromFile(const string& filename)
+{
     ifstream in(filename);
     if (!in) return;
 
     head = nullptr;
+
     string line;
+    getline(in, line); // skip CSV header
 
-    while (getline(in, line)) {
+    while (getline(in, line))
+    {
+        if (line.empty()) continue;
+
         stringstream ss(line);
-        
-        string id, name, contact, type, addr;
+        string value;
 
-        getline(ss, id, ',');
+        int id = 0;
+        string name, contact, type, addr;
+
+        getline(ss, value, ',');
+        id = atoi(value.c_str());
+
         getline(ss, name, ',');
         getline(ss, contact, ',');
         getline(ss, type, ',');
-        getline(ss, addr, ',');
+        getline(ss, addr);
 
-        Donor d(stoi(id), name, contact, type, addr);
+        Donor d(id, name, contact, type, addr);
         addDonor(d);
     }
 
     in.close();
 }
+
 // ---------------- FoodDonation ----------------
 FoodDonation::FoodDonation(int dId, int drId, string type, int qty, string date, string stat)
 {
@@ -948,28 +975,41 @@ void DonationLinkedList::loadFromFile(const string& filename)
     if (!in) return;
 
     head = nullptr;
+
     string line;
+    getline(in, line); // skip CSV header
 
     while (getline(in, line))
     {
+        if (line.empty()) continue;
+
         stringstream ss(line);
+        string value;
 
-        string did, donorid, food, qty, orgQty, exp, stat;
+        int did = 0, donorid = 0, qty = 0;
+        string food, exp, stat;
 
-        getline(ss, did, ',');       // Donation ID
-        getline(ss, donorid, ',');   // Donor ID
-        getline(ss, food, ',');      // Food Type
-        getline(ss, qty, ',');       // Quantity
-        getline(ss, exp, ',');       // Expiry
-        getline(ss, stat);      // Status
+        getline(ss, value, ',');
+        did = atoi(value.c_str());
 
-        FoodDonation d(stoi(did),stoi(donorid),food,stoi(qty),exp,stat);
+        getline(ss, value, ',');
+        donorid = atoi(value.c_str());
 
+        getline(ss, food, ',');
+
+        getline(ss, value, ',');
+        qty = atoi(value.c_str());
+
+        getline(ss, exp, ',');
+        getline(ss, stat);
+
+        FoodDonation d(did, donorid, food, qty, exp, stat);
         addDonation(d);
     }
 
     in.close();
 }
+
 
 void displayDonorDonationStatistics(DonorLinkedList& donors, DonationLinkedList& donations) {
     cout << "\n==================================================\n";

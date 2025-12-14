@@ -20,98 +20,13 @@ vector<string> predefinedLocations = {
 int main() {
 	Roads<string> cityRoads;
 	initializeKarachiMap();
-	donors.loadFromFile("donors.txt");
-	donations.loadFromFile("donations.txt");
-	loadFulfilledRequests(fulfilledStack, "fulfilled_request.txt");
+	donors.loadFromFile("donors.csv");
+	donations.loadFromFile("donations.csv");
+	loadFulfilledRequests(fulfilledStack, "fulfilled_request.csv");
 
 
 	loadPendingRequests(pendingQueue, "pending.txt");
 	loadUrgentRequests(requestPQ, "urgent.txt");
-/*	cout << "\n===== RUNNING HARD-CODED TEST CASES =====\n\n";
-
-	initializeKarachiMap()*/;
-
-	//start of hardcoded test cases
-	// ---------------------------------------------
-	// 1) Donors
-	// ---------------------------------------------
-	DonorLinkedList donors;
-	donors.addDonor(Donor(101, "Ali Khan", "0300-1111111", "Individual", "Gulshan-e-Iqbal"));
-	donors.addDonor(Donor(102, "Fatima Trust", "0300-2222222", "Organization", "North Nazimabad"));
-	donors.addDonor(Donor(103, "Usman Welfare", "0300-3333333", "Organization", "Clifton"));
-
-	cout << "-- Donors Added --\n";
-	donors.displayDonors();
-	cout << "\n";
-
-	// ---------------------------------------------
-	// 2) Donations
-	// ---------------------------------------------
-	DonationLinkedList donations;
-	donations.addDonation(FoodDonation(1, 101, "Rice", 50, "2025-12-20", "Pending"));
-	donations.addDonation(FoodDonation(2, 102, "Daal", 30, "2025-12-22", "Pending"));
-	donations.addDonation(FoodDonation(3, 103, "Water", 100, "2025-12-30", "Pending"));
-
-	cout << "-- Donations Added --\n";
-	donations.displayDonations();
-	cout << "\n";
-
-	// ---------------------------------------------
-	// 3) Urgent Requests
-	// ---------------------------------------------
-	PriorityQueue<Request> requestPQ;
-	Queue<Request> pendingQueue;
-	Stack<Request> fulfilledStack;
-
-	requestPQ.push(Request("Rehan", "Rice", 20, "Hospital", "Aga Khan", "North Nazimabad", "2024-12-25"));
-	requestPQ.push(Request("Sana", "Water", 50, "Charity", "Edhi Center", "Gulshan-e-Iqbal", "2024-12-25"));
-	requestPQ.push(Request("Ahmed", "Daal", 20, "OldAge Home", "Bait-ul-Sukoon", "Gulshan-e-Iqbal", "2024-12-26"));
-
-	cout << "-- Urgent Requests Added --\n";
-	requestPQ.display();
-	cout << "\n";
-
-	// ---------------------------------------------
-	// 4) Fulfill Requests
-	// ---------------------------------------------
-	cout << "=== Testing Urgent Request Fulfillment ===\n\n";
-
-	int fulfilled = 0;
-	while (!requestPQ.isEmpty()) {
-		Request r = requestPQ.top();
-		requestPQ.pop();
-
-		FoodDonation* match = donations.findMatchingDonation(r.foodType, r.quantity, r.requestDate, r);
-		if (match) {
-			match->reduceQuantity(r.quantity);
-			r.isFulfilled = true;
-			fulfilledStack.push(r);
-
-			Donor* donor = donors.searchDonor(match->getDonorId());
-			if (donor) {
-				cout << "\nShortest path from Donor at "
-					<< donor->getAddress()
-					<< " to Request Location "
-					<< r.location << ":\n";
-
-				karachiRoads.shortestPath(donor->getAddress(), r.location);
-			}
-
-			fulfilled++;
-			cout << "\nDelivered " << r.quantity << " " << r.foodType
-				<< " to " << r.recipientName << "\n";
-		}
-		else {
-			pendingQueue.enqueue(r);
-			break;
-		}
-	}
-
-	cout << "\n=== FULFILL SUMMARY ===\n";
-	cout << "Requests fulfilled: " << fulfilled << "\n";
-	cout << "Pending requests left: " << pendingQueue.size() << "\n";
-	//end of hardcoded test cases
-
 
 
 	int choice;
