@@ -1,5 +1,7 @@
 ﻿#include "redistribution.hpp"
 #include <iostream>
+#include <stdlib.h>
+#include <Windows.h>
 
 
 using namespace std;
@@ -17,6 +19,10 @@ vector<string> predefinedLocations = {
 	"Shahrah-e-Faisal", "Gulberg", "Landhi", "SITE", "Buffer Zone"
 };
 
+void clearScreen() {
+	std::system("cls");
+}
+
 int main() {
 	initializeKarachiMap();
 	donors.loadFromFile("donors.csv");
@@ -26,14 +32,21 @@ int main() {
 
 	loadPendingRequests(pendingQueue, "pending.csv");
 	loadUrgentRequests(requestPQ, "urgent.csv");
-
+	
+	cout << R"(
+______  _____   _____ 
+|  ___|/  __ \ /  ___|
+| |_   | |  | |\ `--. 
+|  _|  | |  | | `--. \
+| |    | |__| |/\__/ /
+\_|    |_____/ \____/ 
+    )" << endl;
+	cout << "Food Redistribution System\n\n";
 
 	int choice;
 	do {
-		cout << "==================================================" << endl;
-		cout << "     FOOD REDISTRIBUTION SYSTEM - MAIN MENU     " << endl;
-		cout << "==================================================" << endl << endl;
 
+		cout << "--- MAIN MENU ---\n\n";
 		cout << "1. Donor Management" << endl;
 		cout << "2. Donation Management" << endl;
 		cout << "3. Request Management" << endl;
@@ -44,6 +57,7 @@ int main() {
 		cout << "Enter your choice: ";
 		cin >> choice;
 		cin.ignore();
+		clearScreen();
 
 		// 1. DONOR MANAGEMENT
 		if (choice == 1) {
@@ -57,6 +71,7 @@ int main() {
 				cout << "5. Back to Main Menu\n\n";
 				cout << "Enter choice: ";
 				cin >> sub; cin.ignore();
+				clearScreen();
 
 				if (sub == 1) {
 					int id; string name, contact, type, address;
@@ -124,6 +139,7 @@ int main() {
 				cout << "4. Remove Expired Donations\n";
 				cout << "5. Back to Main Menu\n\n";
 				cout << "Enter choice: ";
+				clearScreen();
 				cin >> sub; cin.ignore();
 
 				if (sub == 1) {
@@ -180,6 +196,7 @@ int main() {
 				cout << "6. Back to Main Menu\n\n";
 				cout << "Enter choice: ";
 				cin >> sub; cin.ignore();
+				clearScreen();
 
 				if (sub == 1) {
 					string name, food, orgType, orgName, loc, date; int qty;
