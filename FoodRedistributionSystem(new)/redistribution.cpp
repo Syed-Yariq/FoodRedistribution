@@ -931,10 +931,13 @@ void DonationLinkedList::displayDonationItemsOnly() const {
 void DonationLinkedList::removeExpiredDonations(const string& todayDate) {
     DonationNode* temp = head;
     DonationNode* prev = nullptr;
+    bool foundExpired = false;   
 
     while (temp != nullptr) {
         // expired if expiry <= today
         if (temp->data.getExpiryDate() <= todayDate) {
+            foundExpired = true; // NEW
+
             cout << "Removing expired donation: " << temp->data.getFoodType()
                 << " (Expiry: " << temp->data.getExpiryDate() << ")\n";
 
@@ -954,9 +957,14 @@ void DonationLinkedList::removeExpiredDonations(const string& todayDate) {
             prev = temp;
             temp = temp->next;
         }
+    }
 
+    // NEW cout for no expired donations
+    if (!foundExpired) {
+        cout << "No expired donations found.\n";
     }
 }
+
 void DonationLinkedList::saveToFile(const string& filename) {
     ofstream out(filename);
     DonationNode* temp = head;

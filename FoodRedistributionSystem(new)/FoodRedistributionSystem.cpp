@@ -139,9 +139,8 @@ ______  _____   _____
 				cout << "4. Remove Expired Donations\n";
 				cout << "5. Back to Main Menu\n\n";
 				cout << "Enter choice: ";
-				clearScreen();
 				cin >> sub; cin.ignore();
-
+				clearScreen();
 				if (sub == 1) {
 					int donationId, donorId, quantity; string foodType, expiry;
 					cout << "\nEnter Donation ID: "; cin >> donationId;
